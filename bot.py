@@ -35,7 +35,7 @@ class TheBot(object):
             self.player.resume()
 
         async def action_shuffle(message):
-            first, self.music_queue = self.music_queue[0:]
+            first, *self.music_queue = self.music_queue
             random.shuffle(self.music_queue)
             self.music_queue.insert(0, first)
             await self.client.send_message(message.channel, "Playlist was shuffled.")
