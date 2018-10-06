@@ -83,6 +83,8 @@ class TheBot(object):
             try:
                 if message.author.bot:
                     return ()
+                if message.author.id == "116825382493224962":
+                    return ()
 
                 if message.content[0] == ".":
                     await self.actions[message.content.split(" ")[0]][0](message)
@@ -115,6 +117,8 @@ class TheBot(object):
                     if len(self.music_queue) > 0:
                         self.music_queue.pop(0)
                     pickle.dump(self.music_queue, open('music_list.txt', 'wb'))
+                    if len(self.music_queue) == 0:
+                        continue
 
             next_url = self.music_queue[0]
             self.player = await self.voice_channel.create_ytdl_player(next_url)
