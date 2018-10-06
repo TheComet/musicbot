@@ -2,11 +2,10 @@ import discord
 import random
 import asyncio
 import pickle
-import random
+import json
 from urllib.parse import urlparse, parse_qs, urlencode
 
-TEXT_CHANNEL_ID = "497830999204560920"
-VOICE_CHANNEL_ID = "497830999707746305"
+config = json.loads(open('config.json', 'r').read())
 
 
 class TheBot(object):
@@ -70,11 +69,11 @@ class TheBot(object):
             print(self.client.user.id)
             print('------')
 
-            vc = self.client.get_channel(VOICE_CHANNEL_ID)
+            vc = self.client.get_channel(config['voice channel id'])
             self.voice_channel = await self.client.join_voice_channel(vc)
             asyncio.ensure_future(self.player_task())
 
-            await self.client.send_message(self.client.get_channel(TEXT_CHANNEL_ID), "OwO I'm back OwO")
+            await self.client.send_message(self.client.get_channel(config['text channel id']), "OwO I'm back OwO")
 
         @self.client.event
         async def on_message(message):
@@ -117,13 +116,12 @@ class TheBot(object):
             next_url = self.music_queue[0]
             self.player = await self.voice_channel.create_ytdl_player(next_url)
             self.player.start()
-            await self.client.send_message(self.client.get_channel(TEXT_CHANNEL_ID),
+            await self.client.send_message(self.client.get_channel(config['text channel id']),
                                            "Playing {} ({})\n{} left in queue".format(
                                                self.player.title,
                                                self.player.duration,
                                                len(self.music_queue) - 1))
 
 
-token = open('secret_token.txt', 'r').read().strip()
 bot = TheBot()
-bot.client.run(token)
+bot.client.run(config['token'])
