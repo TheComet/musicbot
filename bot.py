@@ -43,7 +43,7 @@ class TheBot(object):
             await self.client.send_message(message.channel, "Playlist was shuffled.")
 
         async def action_list(message):
-            await self.client.send_message(message.channel, "{}".format(self.music_queue))
+            await self.client.send_message(message.channel, "<"+">\n<".join(self.music_queue)+">")
 
         async def action_help(message):
             await self.client.send_message(message.channel,
