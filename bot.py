@@ -43,7 +43,10 @@ class TheBot(object):
             await self.client.send_message(message.channel, "Playlist was shuffled.")
 
         async def action_list(message):
-            await self.client.send_message(message.channel, "<"+">\n<".join(self.music_queue)+">")
+            if len(message.content.split(" ")) > 1 and message.content.split(" ")[1] == "pv":
+                await self.client.send_message(message.channel, "{}".format(self.music_queue))
+            else:
+                await self.client.send_message(message.channel, "<"+">\n<".join(self.music_queue)+">")
 
         async def action_help(message):
             await self.client.send_message(message.channel,
@@ -55,13 +58,13 @@ class TheBot(object):
                                            + "```")
 
         self.actions = {
-            ".pause":   (action_pause,  "pause track"),
-            ".resume":  (action_resume, "resume track"),
-            ".skip":    (action_skip,   "skip track"),
-            ".shuffle": (action_shuffle,   "shuffle playlist"),
-            ".gay":     (action_gay,    "???"),
-            ".list":    (action_list,   "list queued urls"),
-            ".help":    (action_help,   "print this help"),
+            ".pause":   (action_pause,   "pause track"),
+            ".resume":  (action_resume,  "resume track"),
+            ".skip":    (action_skip,    "skip track"),
+            ".shuffle": (action_shuffle, "shuffle playlist"),
+            ".gay":     (action_gay,     "???"),
+            ".list":    (action_list,    "[pv] list queued urls, optional preview"),
+            ".help":    (action_help,    "print this help"),
         }
 
         @self.client.event
