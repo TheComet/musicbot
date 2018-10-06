@@ -2,6 +2,7 @@ import discord
 import random
 import asyncio
 import pickle
+import random
 from urllib.parse import urlparse, parse_qs, urlencode
 
 TEXT_CHANNEL_ID = "498086947105931276"
@@ -36,9 +37,10 @@ class TheBot(object):
             self.player.resume()
 
         async def action_shuffle(message):
-            cur, *self.music_queue = self.music_queue[0:]
+            first, self.music_queue = self.music_queue[0:]
             random.shuffle(self.music_queue)
-            self.music_queue.insert(0,cur)
+            self.music_queue.insert(0, first)
+            await self.client.send_message(message.channel, "Playlist was shuffled.")
 
         async def action_list(message):
             await self.client.send_message(message.channel, "{}".format(self.music_queue))
