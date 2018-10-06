@@ -16,6 +16,7 @@ class TheBot(object):
         self.is_playing = False
         self.player = None
         self.music_queue = pickle.load(open('music_list.txt', 'rb'))
+        self.ffmpeg_ss = 0
 
         async def action_skip(message):
             self.player.stop()
@@ -33,6 +34,12 @@ class TheBot(object):
         async def action_resume(message):
             await self.client.send_message(message.channel, "résumé")
             self.player.resume()
+
+        async def action_jump(message):
+            self.ffmpeg_ss = float(message.content.split(" ")[1])*60
+            await self.client.send_message(message.channel, "jumping to minute {}".format(self.ffmpeg_ss/60))
+            self.music_queue.insert(0, self.music_queue[0])
+            self.player.stop()
 
         async def action_shuffle(message):
             first, *self.music_queue = self.music_queue
@@ -60,8 +67,9 @@ class TheBot(object):
             ".resume":  (action_resume,  "resume track"),
             ".skip":    (action_skip,    "skip track"),
             ".shuffle": (action_shuffle, "shuffle playlist"),
-            ".gay":     (action_gay,     "???"),
+            ".jump":    (action_jump,    "#min from start"),
             ".list":    (action_list,    "[pv] list queued urls, optional preview"),
+            ".gay":     (action_gay,     "???"),
             ".help":    (action_help,    "print this help"),
         }
 
@@ -114,21 +122,30 @@ class TheBot(object):
                 if not self.player.is_done():
                     continue
                 else:
-                    if len(self.music_queue) > 0:
+                    if len(self.music_queue) > 1:
                         self.music_queue.pop(0)
                     pickle.dump(self.music_queue, open('music_list.txt', 'wb'))
                     if len(self.music_queue) == 0:
                         continue
 
             next_url = self.music_queue[0]
-            self.player = await self.voice_channel.create_ytdl_player(next_url)
-            self.player.start()
-            await self.client.send_message(self.client.get_channel(config['text channel id']),
-                                           "Playing {} ({})\n{} left in queue".format(
-                                               self.player.title,
-                                               self.player.duration,
-                                               len(self.music_queue) - 1))
 
+            self.player = await self.voice_channel.create_ytdl_player(next_url, before_options="-ss {}".format(self.ffmpeg_ss))
+            if self.ffmpeg_ss < self.player.duration:
+                self.ffmpeg_ss = 0
+                self.player.start()
+                await self.client.send_message(self.client.get_channel(config['text channel id']),
+                                               "Playing {} ({})\n{} left in queue".format(
+                                                   self.player.title,
+                                                   self.player.duration,
+                                                   len(self.music_queue) - 1))
+            else:
+                await self.client.send_message(self.client.get_channel(config['text channel id']),
+                                               "Jumped to {}s track ended at {}s".format(
+                                                   self.ffmpeg_ss,
+                                                   self.player.duration))
+                self.ffmpeg_ss = 0
+                self.player.stop()
 
 bot = TheBot()
 bot.client.run(config['token'])
