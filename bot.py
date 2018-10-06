@@ -5,10 +5,9 @@ import pickle
 import random
 from urllib.parse import urlparse, parse_qs, urlencode
 
-TEXT_CHANNEL_ID = "498086947105931276"
-VOICE_CHANNEL_ID = "498086947105931278"
-# TOKEN = "NDk3ODY3MzAzODM3MzY4MzM5.DplrfA.mL1m2lO_zmnAQ2pomM36GIEjrdk"
-TOKEN = "NDk4MDg2Mjk4MjQ2OTcxNDE0.Dpom3A.JDbPuFTPomA8IR_xBCE-Yu8TClI"
+TEXT_CHANNEL_ID = "497830999204560920"
+VOICE_CHANNEL_ID = "497830999707746305"
+
 
 class TheBot(object):
     def __init__(self):
@@ -125,5 +124,6 @@ class TheBot(object):
                                                len(self.music_queue) - 1))
 
 
+token = open('secret_token.txt', 'r').read().strip()
 bot = TheBot()
-bot.client.run(TOKEN)
+bot.client.run(token)
