@@ -1,6 +1,7 @@
 import discord
 import asyncio
 import pickle
+import random
 from urllib.parse import urlparse, parse_qs, urlencode
 
 
@@ -47,7 +48,13 @@ class TheBot(object):
                     self.player.resume()
                     return ()
                 elif message.content == ".help":
-                    await self.client.send_message(message.channel, "```Command list:\n.skip\n.pause\n.resume\n.help```")
+                    await self.client.send_message(message.channel, "```Command list:\n.skip\n.pause\n.resume\n.randomize```")
+                    return ()
+                elif message.content == ".randomize":
+                    first, self.music_queue = self.music_queue[0:]
+                    random.shuffle(self.music_queue)
+                    self.music_queue.insert(0, first)
+                    await self.client.send_message(message.channel, "Playlist was shuffled.")
                     return ()
 
                 for possible_url in message.content.split('\n'):
