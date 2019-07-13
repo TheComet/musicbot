@@ -1,2 +1,4 @@
-discord.py
+discord.py<1.0.0
+PyNaCl
+youtube_dl
 

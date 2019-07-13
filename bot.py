@@ -3,9 +3,16 @@ import random
 import asyncio
 import pickle
 import json
+import os
 from urllib.parse import urlparse, parse_qs, urlencode
 
 config = json.loads(open('config.json', 'r').read())
+
+
+def load_music_queue():
+    if os.path.isfile('music_list.txt'):
+        return pickle.load(open('music_list.txt', 'rb'))
+    return list()
 
 
 class TheBot(object):
@@ -15,7 +22,7 @@ class TheBot(object):
         self.voice_channel = None
         self.is_playing = False
         self.player = None
-        self.music_queue = pickle.load(open('music_list.txt', 'rb'))
+        self.music_queue = load_music_queue()
         self.ffmpeg_ss = 0
 
         async def action_skip(message):
@@ -91,7 +98,7 @@ class TheBot(object):
             try:
                 if message.author.bot:
                     return ()
-                if message.author.id == "116825382493224962":
+                if not message.channel.id == config['text channel id']:
                     return ()
 
                 if message.content[0] == ".":
@@ -100,7 +107,10 @@ class TheBot(object):
 
                 for msg_cont in message.content.split('\n'):
                     try:
-                        url = "https://www.youtube.com/watch/?" + urlencode(dict(v=parse_qs(urlparse(msg_cont).query)['v'][0]))
+                        if "youtu.be" in msg_cont:
+                            url = "https://www.youtube.com/watch/?" + urlencode(dict(v=msg_cont.split("/")[-1]))
+                        else:
+                            url = "https://www.youtube.com/watch/?" + urlencode(dict(v=parse_qs(urlparse(msg_cont).query)['v'][0]))
                     except:
                         continue
                     self.add_to_queue(url)
@@ -149,3 +159,4 @@ class TheBot(object):
 
 bot = TheBot()
 bot.client.run(config['token'])
+
